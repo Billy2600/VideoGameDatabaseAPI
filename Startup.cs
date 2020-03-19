@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using VideoGameAPI.Models;
 
 namespace VideoGameAPI
 {
@@ -25,6 +27,8 @@ namespace VideoGameAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ConsoleContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
+
             services.AddControllers();
         }
 
