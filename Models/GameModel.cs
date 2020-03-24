@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VideoGameAPI.Models
 {
@@ -9,7 +10,12 @@ namespace VideoGameAPI.Models
         public int GameId { get; set; }
         public string GameName { get; set; }
         public DateTime ReleaseDate { get; set; }
-        public int PublisherId { get; set; }
-        public int GenreId { get; set; }
+        public int? PublisherId { get; set; }
+        public int? GenreId { get; set; }
+
+        [NotMapped]
+        public string PublisherName { get; set; }
+        [NotMapped]
+        public string GenreName { get; set; }
     }
 }
