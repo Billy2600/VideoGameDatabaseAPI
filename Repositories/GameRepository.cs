@@ -40,23 +40,7 @@ namespace VideoGameAPI.Repositories
 
         public async Task<GameModel> Add(GameModel newGame)
         {
-            if (newGame.PublisherId == null && newGame.PublisherName != null)
-            {
-                var publisher = _publisherContext.Publishers.Where(x => x.PublisherName == newGame.PublisherName).FirstOrDefault();
-                if (publisher != null)
-                {
-                    newGame.PublisherId = publisher.PublisherId;
-                }
-                else
-                {
-                    _publisherContext.Publishers.Add(new PublisherModel { PublisherName = newGame.PublisherName });
-                    var addedPublisher = _publisherContext.Publishers.Where(x => x.PublisherName == newGame.PublisherName).FirstOrDefault();
-                    if (addedPublisher != null) // Should never be null
-                    {
-                        newGame.PublisherId = addedPublisher.PublisherId;
-                    }
-                }
-            }
+            if(newGame.PublisherId == null && newGame.PublisherName != null) newGame.PublisherId = AddOrRetrievePublisher(newGame.PublisherName);
 
             _gameContext.Games.Add(newGame);
             await _gameContext.SaveChangesAsync();
@@ -76,6 +60,22 @@ namespace VideoGameAPI.Repositories
             await _gameContext.SaveChangesAsync();
 
             return gameModel;
+        }
+
+        private int AddOrRetrievePublisher(string publisherName)
+        {
+            if (_publisherContext.Publishers.Where(x => x.PublisherName == publisherName).FirstOrDefault() == null)
+            {
+                var newPublisher = new PublisherModel { PublisherName = publisherName };
+                _publisherContext.Publishers.Add(newPublisher);
+                _publisherContext.SaveChanges();
+
+                return newPublisher.PublisherId;
+            }
+            else
+            {
+                return _publisherContext.Publishers.Where(x => x.PublisherName == publisherName).FirstOrDefault().PublisherId;
+            }
         }
 
         public bool GameExists(int id)
