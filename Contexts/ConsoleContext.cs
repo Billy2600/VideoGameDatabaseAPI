@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
+using VideoGameAPI.Models;
 
-namespace VideoGameAPI.Models
+namespace VideoGameAPI.Contexts
 {
     [Table("Consoles")]
     public class ConsoleContext : DbContext

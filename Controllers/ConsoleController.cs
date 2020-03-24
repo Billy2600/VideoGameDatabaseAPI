@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VideoGameAPI.Models;
+using VideoGameAPI.Contexts;
 
 namespace VideoGameAPI.Controllers
 {
