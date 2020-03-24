@@ -4,11 +4,11 @@ IF (NOT EXISTS (SELECT *
                 AND  TABLE_NAME = 'Consoles'))
 BEGIN
 	CREATE TABLE Consoles (
-		ConsoleId INT IDENTITY,
-		ConsoleName VARCHAR(255),
-		ReleaseDate DATE,
-		Manufacturer VARCHAR(255),
-		UnitsSold INT
+		ConsoleId INT IDENTITY PRIMARY KEY NOT NULL,
+		ConsoleName VARCHAR(255) NOT NULL,
+		ReleaseDate DATE NULL,
+		Manufacturer VARCHAR(255) NULL,
+		UnitsSold INT NULL
 	);
 
 	--Only abritarily 'notable' consoles have been included
