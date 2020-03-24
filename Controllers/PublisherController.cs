@@ -102,6 +102,12 @@ namespace VideoGameAPI.Controllers
             return publisherModel;
         }
 
+        [HttpGet("GateIdByName/{name}")]
+        public async Task<ActionResult<int>> GetIdByName(string name)
+        {
+            return await _context.GetIdByName(name);
+        }
+
         private bool PublisherModelExists(int id)
         {
             return _context.Publishers.Any(e => e.PublisherId == id);
