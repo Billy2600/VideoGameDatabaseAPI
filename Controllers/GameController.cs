@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using VideoGameAPI.Contexts;
+using VideoGameAPI.Repositories;
 using VideoGameAPI.Models;
 
 namespace VideoGameAPI.Controllers
@@ -14,25 +14,25 @@ namespace VideoGameAPI.Controllers
     [ApiController]
     public class GameController : ControllerBase
     {
-        private readonly GameContext _context;
+        private readonly IGameRepository _repository;
 
-        public GameController(GameContext context)
+        public GameController(IGameRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         // GET: api/Game
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GameModel>>> GetGames()
         {
-            return await _context.Games.ToListAsync();
+            return await _repository.GetGames();
         }
 
         // GET: api/Game/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<GameModel>> GetGameModel(int id)
+        public async Task<ActionResult<GameModel>> GetGame(int id)
         {
-            var gameModel = await _context.Games.FindAsync(id);
+            var gameModel = await _repository.GetGameById(id);
 
             if (gameModel == null)
             {
@@ -46,22 +46,20 @@ namespace VideoGameAPI.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGameModel(int id, GameModel gameModel)
+        public async Task<IActionResult> PutGame(int id, GameModel gameModel)
         {
             if (id != gameModel.GameId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(gameModel).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _repository.UpdateGame(gameModel);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!GameModelExists(id))
+                if (!_repository.GameExists(id))
                 {
                     return NotFound();
                 }
@@ -78,33 +76,24 @@ namespace VideoGameAPI.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<GameModel>> PostGameModel(GameModel gameModel)
+        public async Task<ActionResult<GameModel>> PostGame(GameModel gameModel)
         {
-            _context.Games.Add(gameModel);
-            await _context.SaveChangesAsync();
+            var gameAdded = await _repository.Add(gameModel); // Will potentially make alterations
 
-            return CreatedAtAction("GetGameModel", new { id = gameModel.GameId }, gameModel);
+            return CreatedAtAction("GetGame", new { id = gameAdded.GameId }, gameAdded);
         }
 
         // DELETE: api/Game/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<GameModel>> DeleteGameModel(int id)
+        public async Task<ActionResult<GameModel>> DeleteGame(int id)
         {
-            var gameModel = await _context.Games.FindAsync(id);
+            var gameModel = await _repository.DeleteGame(id);
             if (gameModel == null)
             {
                 return NotFound();
             }
 
-            _context.Games.Remove(gameModel);
-            await _context.SaveChangesAsync();
-
             return gameModel;
-        }
-
-        private bool GameModelExists(int id)
-        {
-            return _context.Games.Any(e => e.GameId == id);
         }
     }
 }

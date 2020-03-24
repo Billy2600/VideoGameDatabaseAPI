@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using VideoGameAPI.Contexts;
+using VideoGameAPI.Repositories;
 
 namespace VideoGameAPI
 {
@@ -31,6 +32,8 @@ namespace VideoGameAPI
             services.AddDbContext<GenreContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
             services.AddDbContext<PublisherContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
             services.AddDbContext<GameContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
+
+            services.AddScoped<IGameRepository, GameRepository>();
 
             services.AddControllers();
         }
