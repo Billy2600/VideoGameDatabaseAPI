@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace VideoGameAPI.Models
 {
     public class GameModel
     {
+        [Key]
         public int GameId { get; set; }
         public string GameName { get; set; }
         public DateTime ReleaseDate { get; set; }

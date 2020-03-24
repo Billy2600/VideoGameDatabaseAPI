@@ -28,6 +28,8 @@ namespace VideoGameAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ConsoleContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
+            services.AddDbContext<GenreContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
+            services.AddDbContext<PublisherContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
 
             services.AddControllers();
         }
