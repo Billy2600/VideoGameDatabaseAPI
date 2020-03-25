@@ -7,7 +7,7 @@ namespace VideoGameAPI.Repositories
 {
     public interface IGameRepository
     {
-        public Task<IEnumerable<GameModel>> GetGames();
+        public IEnumerable<GameModel> GetGames();
         public Task<ActionResult<GameModel>> GetGameById(int id);
         public Task UpdateGame(GameModel gameModel);
         public Task<GameModel> Add(GameModel newGame);

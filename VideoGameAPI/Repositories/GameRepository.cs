@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace VideoGameAPI.Repositories
 {
@@ -19,11 +20,11 @@ namespace VideoGameAPI.Repositories
             _publisherContext = publisherContext;
         }
 
-        public async Task<IEnumerable<GameModel>> GetGames()
+        public IEnumerable<GameModel> GetGames()
         {
             // Convert these to lists so that we can do a join on them without error
-            var games = await _gameContext.Games.ToListAsync();
-            var publishers = await _publisherContext.Publishers.ToListAsync();
+            var games = _gameContext.Games.ToList();
+            var publishers = _publisherContext.Publishers.ToList();
 
             return (from game in games
                     join publisher in publishers on game.PublisherId equals publisher.PublisherId

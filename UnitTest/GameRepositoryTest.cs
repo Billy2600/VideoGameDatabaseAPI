@@ -90,6 +90,51 @@ namespace UnitTest
             Assert.IsNull(testGame.PublisherName);
         }
 
+        [TestMethod]
+        public void GetGames_BasicTest()
+        {
+            // Arrange
+            var publisherId = _fixture.Create<int>();
+
+            _fixture.Customize<GameModel>(x => x
+                .With(y => y.PublisherId, publisherId) // Assign all games to testPublisher
+                .Without(y => y.PublisherName)
+            );
+            var testGames = _fixture.CreateMany<GameModel>();
+
+            var testPublisher = new PublisherModel()
+            {
+                PublisherId = publisherId,
+                PublisherName = _fixture.Create<string>()
+            };
+
+            var gameContextMock = new Mock<GameContext>();
+            var gameDbSet = CreateDbSetMock(testGames);
+            var publisherContextMock = new Mock<PublisherContext>();
+            var publisherDbSet = CreateDbSetMock(new List<PublisherModel>() { testPublisher });
+
+            gameContextMock.Setup(x => x.Games).Returns(gameDbSet.Object);
+            publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+
+            var gameRepo = new GameRepository(gameContextMock.Object, publisherContextMock.Object);
+
+            // Act
+            var gameResults = gameRepo.GetGames();
+
+            // Assert
+            Assert.AreEqual(testGames.Count(), gameResults.Count());
+            for(int i = 0; i < testGames.Count(); i++)
+            {
+                var testGame = testGames.ElementAt(i);
+                var gameResult = gameResults.ElementAt(i);
+
+                Assert.AreEqual(testGame.GameId, gameResult.GameId);
+                Assert.AreEqual(testGame.GameName, gameResult.GameName);
+                Assert.AreEqual(testGame.PublisherId, gameResult.PublisherId);
+                Assert.AreEqual(testPublisher.PublisherName, gameResult.PublisherName);
+            }   
+        }
+
         private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class
         {
             var elementsAsQueryable = elements.AsQueryable();
