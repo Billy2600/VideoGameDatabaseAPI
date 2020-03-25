@@ -7,7 +7,9 @@ namespace VideoGameAPI.Contexts
     [Table("Games")]
     public class GameContext : DbContext
     {
-        public DbSet<GameModel> Games { get; set; }
+        public virtual DbSet<GameModel> Games { get; set; } // Virtual as to be overridden for unit testing
+
+        public GameContext() { }
 
         public GameContext(DbContextOptions<GameContext> options)
             : base(options)

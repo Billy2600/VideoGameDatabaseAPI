@@ -9,7 +9,9 @@ namespace VideoGameAPI.Contexts
     [Table("Publishers")]
     public class PublisherContext : DbContext
     {
-        public DbSet<PublisherModel> Publishers { get; set; }
+        public virtual DbSet<PublisherModel> Publishers { get; set; } // Virtual as to be overridden for unit testing
+
+        public PublisherContext() { }
 
         public PublisherContext(DbContextOptions<PublisherContext> options)
             : base(options)
