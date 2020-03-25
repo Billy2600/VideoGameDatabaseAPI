@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\VideoGameAPI.csproj" />
+    <ProjectReference Include="..\VideoGameAPI\VideoGameAPI.csproj" />
   </ItemGroup>
 
 </Project>
