@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace UnitTest
 {
@@ -133,6 +134,125 @@ namespace UnitTest
                 Assert.AreEqual(testGame.PublisherId, gameResult.PublisherId);
                 Assert.AreEqual(testPublisher.PublisherName, gameResult.PublisherName);
             }   
+        }
+
+        [TestMethod]
+        public async Task UpdateGame_BasicTest()
+        {
+            // Arrange
+            var testGame = new GameModel()
+            {
+                GameId = _fixture.Create<int>(),
+                GameName = _fixture.Create<string>(),
+                PublisherId = _fixture.Create<int>()
+            };
+
+            var gameContextMock = new Mock<GameContext>();
+            var publisherContextMock = new Mock<PublisherContext>();
+
+            var gameRepo = new GameRepository(gameContextMock.Object, publisherContextMock.Object);
+
+            gameContextMock.Setup(x => x.SetModified(It.IsAny<GameModel>()));
+            gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+
+            // Act
+            await gameRepo.UpdateGame(testGame);
+
+            // Assert
+            gameContextMock.Verify(x => x.SetModified(It.IsAny<GameModel>()), Times.Once);
+            gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task Add_BasicTest()
+        {
+            // Arrange
+            var testGame = new GameModel()
+            {
+                GameId = _fixture.Create<int>(),
+                GameName = _fixture.Create<string>(),
+                PublisherName = _fixture.Create<string>()
+            };
+
+            var testPublisher = new PublisherModel()
+            {
+                PublisherId = _fixture.Create<int>(),
+                PublisherName = testGame.PublisherName
+            };
+
+            var gameContextMock = new Mock<GameContext>();
+            var publisherContextMock = new Mock<PublisherContext>();
+            var publisherDbSet = CreateDbSetMock(new List<PublisherModel>() { testPublisher });
+
+            gameContextMock.Setup(x => x.Games.Add(It.IsAny<GameModel>()));
+            gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+            publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+
+            var gameRepo = new GameRepository(gameContextMock.Object, publisherContextMock.Object);
+
+            // Act
+            var gameResult = await gameRepo.Add(testGame);
+
+            // Assert
+            gameContextMock.Verify(x => x.Games.Add(It.IsAny<GameModel>()), Times.Once);
+            gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            Assert.AreEqual(testGame.GameId, gameResult.GameId);
+            Assert.AreEqual(testGame.GameName, gameResult.GameName);
+            Assert.AreEqual(testPublisher.PublisherId, gameResult.PublisherId); // Should've automatically mapped Id based on name
+            Assert.AreEqual(testPublisher.PublisherName, gameResult.PublisherName);
+        }
+
+        [TestMethod]
+        public async Task DeleteGame_BasicTest()
+        {
+            // Arrange
+            var testGame = new GameModel()
+            {
+                GameId = _fixture.Create<int>()
+            };
+
+            var gameContextMock = new Mock<GameContext>();
+            var publisherContextMock = new Mock<PublisherContext>();
+
+            gameContextMock.Setup(x => x.Games.FindAsync(It.IsAny<int>())).ReturnsAsync(testGame);
+            gameContextMock.Setup(x => x.Games.Remove(It.IsAny<GameModel>()));
+            gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+
+            var gameRepo = new GameRepository(gameContextMock.Object, publisherContextMock.Object);
+
+            // Act
+            var deleteResult = await gameRepo.DeleteGame(testGame.GameId);
+
+            // Assert
+            gameContextMock.Verify(x => x.Games.FindAsync(It.IsAny<int>()), Times.Once);
+            gameContextMock.Verify(x => x.Games.Remove(It.IsAny<GameModel>()), Times.Once);
+            gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            Assert.AreEqual(testGame.GameId, deleteResult.GameId);
+        }
+
+        [TestMethod]
+        public async Task DeleteGame_NoGameToDelete()
+        {
+            // Arrange
+            var invalidGameId = _fixture.Create<int>();
+
+            var gameContextMock = new Mock<GameContext>();
+            var publisherContextMock = new Mock<PublisherContext>();
+
+            gameContextMock.Setup(x => x.Games.FindAsync(It.IsAny<int>())).Returns(null);
+            gameContextMock.Setup(x => x.Games.Remove(It.IsAny<GameModel>()));
+            gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+
+            var gameRepo = new GameRepository(gameContextMock.Object, publisherContextMock.Object);
+
+            // Act
+            var deleteResult = await gameRepo.DeleteGame(invalidGameId);
+
+            // Assert
+            gameContextMock.Verify(x => x.Games.FindAsync(It.IsAny<int>()), Times.Once);
+            gameContextMock.Verify(x => x.Games.Remove(It.IsAny<GameModel>()), Times.Never);
+            gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+            Assert.IsNull(deleteResult);
         }
 
         private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class

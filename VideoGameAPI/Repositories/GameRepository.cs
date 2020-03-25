@@ -45,7 +45,7 @@ namespace VideoGameAPI.Repositories
 
         public async Task UpdateGame(GameModel gameModel)
         {
-            _gameContext.Entry(gameModel).State = EntityState.Modified;
+            _gameContext.SetModified(gameModel);
 
             await _gameContext.SaveChangesAsync();
         }

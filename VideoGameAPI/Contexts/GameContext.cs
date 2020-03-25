@@ -16,5 +16,11 @@ namespace VideoGameAPI.Contexts
         {
 
         }
+
+        // Additional level of abstraction for unit testing
+        public virtual void SetModified(object entity)
+        {
+            Entry(entity).State = EntityState.Modified;
+        }
     }
 }
