@@ -36,8 +36,8 @@ namespace VideoGameAPI.Repositories
         public async Task<ActionResult<GameModel>> GetGameById(int id)
         {
             var gameModel = await _gameContext.Games.FindAsync(id);
-            var publisherName = _publisherContext.Publishers.Where(x => x.PublisherId == gameModel.PublisherId).FirstOrDefault().PublisherName;
-            if (publisherName != null) gameModel.PublisherName = publisherName;
+            var publisher = _publisherContext.Publishers.Where(x => x.PublisherId == gameModel.PublisherId).FirstOrDefault();
+            if (publisher != null) gameModel.PublisherName = publisher.PublisherName;
 
             return gameModel;
         }

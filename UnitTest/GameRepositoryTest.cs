@@ -60,6 +60,36 @@ namespace UnitTest
             Assert.AreEqual(testPublisher.PublisherName, gameResult.Value.PublisherName);
         }
 
+        [TestMethod]
+        public async Task GetGameById_NoPublisher()
+        {
+            // Arrange
+            var testGame = new GameModel()
+            {
+                GameId = _fixture.Create<int>(),
+                GameName = _fixture.Create<string>(),
+                PublisherId = _fixture.Create<int>()
+            };
+
+            var gameContextMock = new Mock<GameContext>();
+            var publisherContextMock = new Mock<PublisherContext>();
+            var publisherDbSet = CreateDbSetMock(new List<PublisherModel>() { }); // No items on purpose
+
+            gameContextMock.Setup(x => x.Games.FindAsync(It.IsAny<int>())).ReturnsAsync(testGame);
+            publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+
+            var gameRepo = new GameRepository(gameContextMock.Object, publisherContextMock.Object);
+
+            // Act
+            var gameResult = await gameRepo.GetGameById(testGame.GameId);
+
+            // Assert
+            Assert.AreEqual(testGame.GameId, gameResult.Value.GameId);
+            Assert.AreEqual(testGame.GameName, gameResult.Value.GameName);
+            Assert.AreEqual(testGame.PublisherId, gameResult.Value.PublisherId);
+            Assert.IsNull(testGame.PublisherName);
+        }
+
         private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class
         {
             var elementsAsQueryable = elements.AsQueryable();
