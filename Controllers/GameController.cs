@@ -25,7 +25,7 @@ namespace VideoGameAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GameModel>>> GetGames()
         {
-            return await _repository.GetGames();
+            return new ActionResult<IEnumerable<GameModel>>(await _repository.GetGames());
         }
 
         // GET: api/Game/5

@@ -19,9 +19,18 @@ namespace VideoGameAPI.Repositories
             _publisherContext = publisherContext;
         }
 
-        public async Task<ActionResult<IEnumerable<GameModel>>> GetGames()
+        public async Task<IEnumerable<GameModel>> GetGames()
         {
-            return await _gameContext.Games.ToListAsync();
+            // Convert these to lists so that we can do a join on them without error
+            var games = await _gameContext.Games.ToListAsync();
+            var publishers = await _publisherContext.Publishers.ToListAsync();
+
+            return (from game in games
+                    join publisher in publishers on game.PublisherId equals publisher.PublisherId
+                    select game + new GameModel
+                    {
+                        PublisherName = publisher.PublisherName
+                    }).ToList();
         }
 
         public async Task<ActionResult<GameModel>> GetGameById(int id)
