@@ -9,6 +9,8 @@ namespace VideoGameAPI.Contexts
     {
         public virtual DbSet<ConsoleModel> Consoles { get; set; } // Virtual as to be overridden for unit testing
 
+        public ConsoleContext() { }
+
         public ConsoleContext(DbContextOptions<ConsoleContext> options)
             : base(options)
         {

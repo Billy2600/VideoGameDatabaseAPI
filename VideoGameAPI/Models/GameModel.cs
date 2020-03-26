@@ -14,11 +14,15 @@ namespace VideoGameAPI.Models
         public int? PublisherId { get; set; }
         [ForeignKey("GenreId")]
         public int? GenreId { get; set; }
+        [ForeignKey("ConsoleId")]
+        public int? ConsoleId { get; set; }
 
         [NotMapped]
         public string PublisherName { get; set; }
         [NotMapped]
         public string GenreName { get; set; }
+        [NotMapped]
+        public string ConsoleName { get; set; }
 
         public static GameModel operator +(GameModel gameA, GameModel gameB)
         {
@@ -30,7 +34,9 @@ namespace VideoGameAPI.Models
                 PublisherId = gameA.PublisherId == null ? gameB.PublisherId : gameA.PublisherId,
                 PublisherName = gameA.PublisherName == null ? gameB.PublisherName : gameA.PublisherName,
                 GenreId = gameA.GenreId == null ? gameB.GenreId : gameA.GenreId,
-                GenreName = gameA.GenreName == null ? gameB.GenreName : gameA.GenreName
+                GenreName = gameA.GenreName == null ? gameB.GenreName : gameA.GenreName,
+                ConsoleId = gameA.ConsoleId == null ? gameB.ConsoleId : gameA.ConsoleId,
+                ConsoleName = gameA.ConsoleName == null ? gameB.ConsoleName : gameA.ConsoleName
             };
 
             return newGame;

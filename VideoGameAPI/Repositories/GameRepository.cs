@@ -13,11 +13,13 @@ namespace VideoGameAPI.Repositories
     {
         private readonly GameContext _gameContext;
         private readonly PublisherContext _publisherContext;
+        private readonly ConsoleContext _consoleContext;
 
-        public GameRepository(GameContext gameContext, PublisherContext publisherContext)
+        public GameRepository(GameContext gameContext, PublisherContext publisherContext, ConsoleContext consoleContext)
         {
             _gameContext = gameContext;
             _publisherContext = publisherContext;
+            _consoleContext = consoleContext;
         }
 
         public IEnumerable<GameModel> GetGames()
@@ -25,20 +27,35 @@ namespace VideoGameAPI.Repositories
             // Convert these to lists so that we can do a join on them without error
             var games = _gameContext.Games.ToList();
             var publishers = _publisherContext.Publishers.ToList();
+            var consoles = _consoleContext.Consoles.ToList();
 
             return (from game in games
-                    join publisher in publishers on game.PublisherId equals publisher.PublisherId
+                    // Doing the equivalent of a SQL left outer join
+                    // We want to include rows where PublisherId and ConsoleId is null
+                    join publisher in publishers on game.PublisherId equals publisher.PublisherId into pub
+                    from publisher in pub.DefaultIfEmpty()
+                    join console in consoles on game.ConsoleId equals console.ConsoleId into con
+                    from console in con.DefaultIfEmpty()
                     select game + new GameModel
                     {
-                        PublisherName = publisher.PublisherName
+                        PublisherName = publisher == null ? null : publisher.PublisherName,
+                        ConsoleName = console == null ? null : console.ConsoleName
                     }).ToList();
         }
 
         public async Task<ActionResult<GameModel>> GetGameById(int id)
         {
             var gameModel = await _gameContext.Games.FindAsync(id);
-            var publisher = _publisherContext.Publishers.Where(x => x.PublisherId == gameModel.PublisherId).FirstOrDefault();
-            if (publisher != null) gameModel.PublisherName = publisher.PublisherName;
+            if (gameModel.PublisherId != null)
+            {
+                var publisher = _publisherContext.Publishers.Where(x => x.PublisherId == gameModel.PublisherId).FirstOrDefault();
+                if (publisher != null) gameModel.PublisherName = publisher.PublisherName;
+            }
+            if (gameModel.ConsoleId != null)
+            {
+                var Console = _consoleContext.Consoles.Where(x => x.ConsoleId == gameModel.ConsoleId).FirstOrDefault();
+                if (Console != null) gameModel.ConsoleName = Console.ConsoleName;
+            }
 
             return gameModel;
         }
@@ -53,6 +70,7 @@ namespace VideoGameAPI.Repositories
         public async Task<GameModel> Add(GameModel newGame)
         {
             if(newGame.PublisherId == null && newGame.PublisherName != null) newGame.PublisherId = AddOrRetrievePublisher(newGame.PublisherName);
+            // Similar functionality for Console purposefully omitted
 
             _gameContext.Games.Add(newGame);
             await _gameContext.SaveChangesAsync();
