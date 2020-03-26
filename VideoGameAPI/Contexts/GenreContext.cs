@@ -9,6 +9,8 @@ namespace VideoGameAPI.Contexts
     {
         public virtual DbSet<GenreModel> Genres { get; set; } // Virtual as to be overridden for unit testing
 
+        public GenreContext() { }
+
         public GenreContext(DbContextOptions<GenreContext> options)
             : base(options)
         {

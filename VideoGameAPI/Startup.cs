@@ -32,6 +32,7 @@ namespace VideoGameAPI
             services.AddDbContext<GenreContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
             services.AddDbContext<PublisherContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
             services.AddDbContext<GameContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
+            services.AddDbContext<GameGenreContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
 
             services.AddScoped<IGameRepository, GameRepository>();
 

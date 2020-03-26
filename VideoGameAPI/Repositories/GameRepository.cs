@@ -14,12 +14,16 @@ namespace VideoGameAPI.Repositories
         private readonly GameContext _gameContext;
         private readonly PublisherContext _publisherContext;
         private readonly ConsoleContext _consoleContext;
+        private readonly GameGenreContext _gameGenreContext;
+        private readonly GenreContext _genreContext;
 
-        public GameRepository(GameContext gameContext, PublisherContext publisherContext, ConsoleContext consoleContext)
+        public GameRepository(GameContext gameContext, PublisherContext publisherContext, ConsoleContext consoleContext, GameGenreContext gameGenreContext, GenreContext genreContext)
         {
             _gameContext = gameContext;
             _publisherContext = publisherContext;
             _consoleContext = consoleContext;
+            _gameGenreContext = gameGenreContext;
+            _genreContext = genreContext;
         }
 
         public IEnumerable<GameModel> GetGames()
@@ -39,7 +43,8 @@ namespace VideoGameAPI.Repositories
                     select game + new GameModel
                     {
                         PublisherName = publisher == null ? null : publisher.PublisherName,
-                        ConsoleName = console == null ? null : console.ConsoleName
+                        ConsoleName = console == null ? null : console.ConsoleName,
+                        Genres = GetGenresForGame(game.GameId) // Might be more efficient but more complex ways to do this
                     }).ToList();
         }
 
@@ -56,6 +61,8 @@ namespace VideoGameAPI.Repositories
                 var Console = _consoleContext.Consoles.Where(x => x.ConsoleId == gameModel.ConsoleId).FirstOrDefault();
                 if (Console != null) gameModel.ConsoleName = Console.ConsoleName;
             }
+
+            gameModel.Genres = GetGenresForGame(gameModel.GameId);
 
             return gameModel;
         }
@@ -106,6 +113,17 @@ namespace VideoGameAPI.Repositories
             {
                 return _publisherContext.Publishers.Where(x => x.PublisherName == publisherName).FirstOrDefault().PublisherId;
             }
+        }
+
+        private List<string> GetGenresForGame(int gameId)
+        {
+            var gameGenres = _gameGenreContext.GamesGenres.ToList();
+            var genres = _genreContext.Genres.ToList();
+
+            return (from gameGenre in gameGenres
+                        join genre in genres on gameGenre.GenreId equals genre.GenreId
+                        where gameGenre.GameId == gameId
+                        select genre.GenreName).ToList();
         }
 
         public bool GameExists(int id)

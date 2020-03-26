@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,8 +13,6 @@ namespace VideoGameAPI.Models
         public DateTime ReleaseDate { get; set; }
         [ForeignKey("PublisherId")]
         public int? PublisherId { get; set; }
-        [ForeignKey("GenreId")]
-        public int? GenreId { get; set; }
         [ForeignKey("ConsoleId")]
         public int? ConsoleId { get; set; }
 
@@ -23,6 +22,8 @@ namespace VideoGameAPI.Models
         public string GenreName { get; set; }
         [NotMapped]
         public string ConsoleName { get; set; }
+        [NotMapped]
+        public List<string> Genres { get; set; }
 
         public static GameModel operator +(GameModel gameA, GameModel gameB)
         {
@@ -33,10 +34,10 @@ namespace VideoGameAPI.Models
                 ReleaseDate = gameA.ReleaseDate == null ? gameB.ReleaseDate : gameA.ReleaseDate,
                 PublisherId = gameA.PublisherId == null ? gameB.PublisherId : gameA.PublisherId,
                 PublisherName = gameA.PublisherName == null ? gameB.PublisherName : gameA.PublisherName,
-                GenreId = gameA.GenreId == null ? gameB.GenreId : gameA.GenreId,
                 GenreName = gameA.GenreName == null ? gameB.GenreName : gameA.GenreName,
                 ConsoleId = gameA.ConsoleId == null ? gameB.ConsoleId : gameA.ConsoleId,
-                ConsoleName = gameA.ConsoleName == null ? gameB.ConsoleName : gameA.ConsoleName
+                ConsoleName = gameA.ConsoleName == null ? gameB.ConsoleName : gameA.ConsoleName,
+                Genres = gameA.Genres == null ? gameB.Genres : gameA.Genres
             };
 
             return newGame;
