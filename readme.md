@@ -1,11 +1,11 @@
-#Video Game Database API
+# ideo Game Database API
 
 This project is a RESTful API, written in C# .NET MVC, which provides information on video games, game consoles, and more.
 
-##Paths
+## Paths
 Here is a list of the most common paths. All paths begin with `api/`.
 
-###`GET` api/Game
+### `GET` api/Game
 Retrieves list of games. Example:
 ```
 {
@@ -36,7 +36,7 @@ Retrieves list of games. Example:
 }
 ```
 
-##`GET` api/Game/{id}
+## `GET` api/Game/{id}
 Retrieves a single game with the specified ID. Example, with the ID `3` specified:
 ```
 {
@@ -54,7 +54,7 @@ Retrieves a single game with the specified ID. Example, with the ID `3` specifie
 }
 ```
 
-##`PUT` api/Game/{id}
+## `PUT` api/Game/{id}
 Updates a game with the specified ID with the JSON contained in the body of the request. The ID in the path and the object _must_ match. Will return nothing on successful update. Example body:
 ```
 {
@@ -63,7 +63,7 @@ Updates a game with the specified ID with the JSON contained in the body of the 
 }
 ```
 
-##`POST` api/Game
+## `POST` api/Game
 Inserts a new game. Game ID and Publisher ID need not be specified. Publisher ID will automatically be mapped based on PublisherName, and if publisher doesn't exist in the database, it will be added. Example:
 ```
 {
