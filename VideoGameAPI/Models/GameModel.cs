@@ -19,8 +19,6 @@ namespace VideoGameAPI.Models
         [NotMapped]
         public string PublisherName { get; set; }
         [NotMapped]
-        public string GenreName { get; set; }
-        [NotMapped]
         public string ConsoleName { get; set; }
         [NotMapped]
         public List<string> Genres { get; set; }
@@ -34,7 +32,6 @@ namespace VideoGameAPI.Models
                 ReleaseDate = gameA.ReleaseDate == null ? gameB.ReleaseDate : gameA.ReleaseDate,
                 PublisherId = gameA.PublisherId == null ? gameB.PublisherId : gameA.PublisherId,
                 PublisherName = gameA.PublisherName == null ? gameB.PublisherName : gameA.PublisherName,
-                GenreName = gameA.GenreName == null ? gameB.GenreName : gameA.GenreName,
                 ConsoleId = gameA.ConsoleId == null ? gameB.ConsoleId : gameA.ConsoleId,
                 ConsoleName = gameA.ConsoleName == null ? gameB.ConsoleName : gameA.ConsoleName,
                 Genres = gameA.Genres == null ? gameB.Genres : gameA.Genres
