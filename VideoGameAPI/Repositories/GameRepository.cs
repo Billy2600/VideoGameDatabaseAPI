@@ -1,5 +1,6 @@
 ﻿using VideoGameAPI.Models;
 using VideoGameAPI.Contexts;
+using VideoGameAPI.Helpers;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -18,14 +19,17 @@ namespace VideoGameAPI.Repositories
         private readonly ConsoleContext _consoleContext;
         private readonly GameGenreContext _gameGenreContext;
         private readonly GenreContext _genreContext;
+        private readonly IFileManager _fileManager;
 
-        public GameRepository(GameContext gameContext, PublisherContext publisherContext, ConsoleContext consoleContext, GameGenreContext gameGenreContext, GenreContext genreContext)
+        public GameRepository(GameContext gameContext, PublisherContext publisherContext, ConsoleContext consoleContext, GameGenreContext gameGenreContext, GenreContext genreContext,
+            IFileManager fileManager)
         {
             _gameContext = gameContext;
             _publisherContext = publisherContext;
             _consoleContext = consoleContext;
             _gameGenreContext = gameGenreContext;
             _genreContext = genreContext;
+            _fileManager = fileManager;
         }
 
         public IEnumerable<GameModel> GetGames()
@@ -155,13 +159,13 @@ namespace VideoGameAPI.Repositories
 
         public async Task ImportCSV(string filePath)
         {
-            if(!System.IO.File.Exists(filePath))
+            if(!_fileManager.FileExists(filePath))
             {
                 throw new FileNotFoundException();
             }
 
-            using (var reader = new StreamReader(filePath))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            using (var reader = _fileManager.StreamReader(filePath))
+            using (var csv = _fileManager.CsvReader(reader, CultureInfo.InvariantCulture))
             {
                 var records = csv.GetRecords<GameCSV>();
 
@@ -173,7 +177,7 @@ namespace VideoGameAPI.Repositories
                         ReleaseDate = DateTime.Parse(record.Year.ToString() + "-01-01"), // We only have a year, but you can't have a DateTime without month and day
                         PublisherName = record.Publisher.Split(',').First(), // Only using the first one, for now
                         Genres = record.Genre.Split(',').Select(x => x.Trim()).ToList(),
-                        ConsoleId = _consoleContext.Consoles.Where(x => x.ConsoleName == record.Console).FirstOrDefault().ConsoleId
+                        ConsoleId = _consoleContext.GetConsoleIdByName(record.Console)
                     };
 
                     await Add(newGame);

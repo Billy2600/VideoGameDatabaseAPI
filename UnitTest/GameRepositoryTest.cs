@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VideoGameAPI.Models;
 using VideoGameAPI.Repositories;
 using VideoGameAPI.Contexts;
+using VideoGameAPI.Helpers;
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,12 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
+using System.IO;
+using CsvHelper;
+using System.Globalization;
+using System.Text;
+using System;
+using System.Linq.Expressions;
 
 namespace UnitTest
 {
@@ -23,6 +30,7 @@ namespace UnitTest
         private Mock<ConsoleContext> _consoleContextMock;
         private Mock<GameGenreContext> _gameGenreContextMock;
         private Mock<GenreContext> _genreContextMock;
+        private Mock<IFileManager> _fileManagerMock;
 
         [TestInitialize]
         public void Initialize()
@@ -33,8 +41,10 @@ namespace UnitTest
             _consoleContextMock = new Mock<ConsoleContext>();
             _gameGenreContextMock = new Mock<GameGenreContext>();
             _genreContextMock = new Mock<GenreContext>();
+            _fileManagerMock = new Mock<IFileManager>();
 
-            _gameRepo = new GameRepository(_gameContextMock.Object, _publisherContextMock.Object, _consoleContextMock.Object, _gameGenreContextMock.Object, _genreContextMock.Object);
+            _gameRepo = new GameRepository(_gameContextMock.Object, _publisherContextMock.Object, _consoleContextMock.Object, _gameGenreContextMock.Object, _genreContextMock.Object,
+                _fileManagerMock.Object);
         }
 
         [TestMethod]
@@ -532,6 +542,69 @@ namespace UnitTest
             _gameContextMock.Verify(x => x.Games.Remove(It.IsAny<GameModel>()), Times.Never);
             _gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
             Assert.IsNull(deleteResult);
+        }
+
+        [TestMethod]
+        public async Task ImportCSV_BasicTest()
+        {
+            // Arrange
+            var testGame = new GameModel()
+            {
+                GameName = _fixture.Create<string>(),
+                ReleaseDate = DateTime.Parse("1999-01-01"),
+                PublisherName = _fixture.Create<string>(),
+                Genres = new List<string>()
+                {
+                    _fixture.Create<string>()
+                }
+            };
+
+            var testConsole = new ConsoleModel()
+            {
+                ConsoleId = _fixture.Create<int>(),
+                ConsoleName = _fixture.Create<string>()
+            };
+
+            var testGenre = new GenreModel()
+            {
+                GenreId = _fixture.Create<int>(),
+                GenreName = testGame.Genres.First()
+            };
+
+            var publisherDbSet = CreateDbSetMock(new List<PublisherModel>() { });
+            var genreDbSet = CreateDbSetMock(new List<GenreModel>() { testGenre });
+
+            var filePath = _fixture.Create<string>();
+
+            var csvFileConents = "Title,Year,Publisher,Genre,Console\n" // Header row; must match GameCSV class
+                + $"{testGame.GameName}, {testGame.ReleaseDate.Year}, {testGame.PublisherName}, {testGenre.GenreName}, {testConsole.ConsoleName}";
+            var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(csvFileConents));
+            var streamReader = new StreamReader(memoryStream);
+            var csvReader = new CsvReader(streamReader, CultureInfo.InvariantCulture);
+
+            var addedGame = new GameModel();
+
+            _gameContextMock.Setup(x => x.Games.Add(It.IsAny<GameModel>())).Callback<GameModel>(x => addedGame = x);
+            _gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+
+            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+            _consoleContextMock.Setup(x => x.GetConsoleIdByName(It.IsAny<string>())).Returns(testConsole.ConsoleId);
+            _genreContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
+
+            _fileManagerMock.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
+            _fileManagerMock.Setup(x => x.StreamReader(It.IsAny<string>())).Returns(streamReader);
+            _fileManagerMock.Setup(x => x.CsvReader(It.IsAny<StreamReader>(), It.IsAny<CultureInfo>())).Returns(csvReader);
+
+            // Act
+            await _gameRepo.ImportCSV(filePath);
+
+            // Assert
+            // All we really care about is that the game was added. Mapping and stuff is tested in the Add() tests
+            _gameContextMock.Verify(x => x.Games.Add(It.IsAny<GameModel>()), Times.Once);
+            _gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+
+            Assert.AreEqual(testGame.GameName, addedGame.GameName);
+            Assert.AreEqual(testGame.ReleaseDate, addedGame.ReleaseDate);
         }
 
         private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class

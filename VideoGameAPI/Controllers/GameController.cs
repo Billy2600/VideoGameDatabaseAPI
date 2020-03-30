@@ -135,7 +135,7 @@ namespace VideoGameAPI.Controllers
                 return StatusCode(500, "Error after uploading file");
             }
 
-            return Ok(new { size = file.Length, filePath });
+            return Ok(new { size = file.Length, message = "CSV file imported" });
         }
     }
 }
