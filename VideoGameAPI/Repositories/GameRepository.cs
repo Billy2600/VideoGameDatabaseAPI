@@ -2,10 +2,12 @@
 using VideoGameAPI.Contexts;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Threading;
+using CsvHelper;
+using System.IO;
+using System.Globalization;
+using System;
 
 namespace VideoGameAPI.Repositories
 {
@@ -149,6 +151,29 @@ namespace VideoGameAPI.Repositories
         public bool GameExists(int id)
         {
             return _gameContext.Games.Any(e => e.GameId == id);
+        }
+
+        public async Task ImportCSV()
+        {
+            using (var reader = new StreamReader("C:\\projects\\VideoGameAPI\\csv\\Genesis.csv"))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            {
+                var records = csv.GetRecords<GameCSV>();
+
+                foreach (var record in records)
+                {
+                    var newGame = new GameModel()
+                    {
+                        GameName = record.Title,
+                        ReleaseDate = DateTime.Parse(record.Year.ToString() + "-01-01"), // We only have a year, but you can't have a DateTime without month and day
+                        PublisherName = record.Publisher.Split(',').First(), // Only using the first one, for now
+                        Genres = record.Genre.Split(',').Select(x => x.Trim()).ToList(),
+                        ConsoleId = _consoleContext.Consoles.Where(x => x.ConsoleName == record.Console).FirstOrDefault().ConsoleId
+                    };
+
+                    await Add(newGame);
+                }
+            }
         }
     }
 }
