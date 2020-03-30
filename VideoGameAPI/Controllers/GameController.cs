@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VideoGameAPI.Repositories;
 using VideoGameAPI.Models;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace VideoGameAPI.Controllers
 {
@@ -15,10 +17,12 @@ namespace VideoGameAPI.Controllers
     public class GameController : ControllerBase
     {
         private readonly IGameRepository _repository;
+        private readonly IConfiguration _config;
 
-        public GameController(IGameRepository repository)
+        public GameController(IGameRepository repository, IConfiguration config)
         {
             _repository = repository;
+            _config = config;
         }
 
         // GET: api/Game
@@ -94,6 +98,44 @@ namespace VideoGameAPI.Controllers
             }
 
             return gameModel;
+        }
+
+        // POST: api/Game/ImportCSV
+        // Upload and import CSV file
+        [HttpPost("ImportCSV")]
+        public async Task<IActionResult> ImportCSV([FromForm] IFormFile file)
+        {
+            var filePath = String.Empty;
+
+            if(file.Length > 5000000)
+            {
+                return StatusCode(413, "File must be 5MB or less");
+            }
+
+            if(file.Length > 0 && file.ContentType == "text/csv")
+            {
+                filePath = Path.Combine(_config.GetSection("StoredFilesPath").Value, Path.GetRandomFileName());
+
+                using (var stream = System.IO.File.Create(filePath))
+                {
+                    await file.CopyToAsync(stream);
+                }
+            }
+            else
+            {
+                return StatusCode(415);
+            }
+
+            try
+            {
+                await _repository.ImportCSV(filePath);
+            }
+            catch (FileNotFoundException)
+            {
+                return StatusCode(500, "Error after uploading file");
+            }
+
+            return Ok(new { size = file.Length, filePath });
         }
     }
 }

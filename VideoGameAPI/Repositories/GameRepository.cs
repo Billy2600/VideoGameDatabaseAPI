@@ -153,9 +153,14 @@ namespace VideoGameAPI.Repositories
             return _gameContext.Games.Any(e => e.GameId == id);
         }
 
-        public async Task ImportCSV()
+        public async Task ImportCSV(string filePath)
         {
-            using (var reader = new StreamReader("C:\\projects\\VideoGameAPI\\csv\\Genesis.csv"))
+            if(!System.IO.File.Exists(filePath))
+            {
+                throw new FileNotFoundException();
+            }
+
+            using (var reader = new StreamReader(filePath))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
                 var records = csv.GetRecords<GameCSV>();

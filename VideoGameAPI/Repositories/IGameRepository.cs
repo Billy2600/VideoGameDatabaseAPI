@@ -13,6 +13,6 @@ namespace VideoGameAPI.Repositories
         public Task<GameModel> Add(GameModel newGame);
         public Task<GameModel> DeleteGame(int id);
         public bool GameExists(int id);
-        public Task ImportCSV();
+        public Task ImportCSV(string filePath);
     }
 }
