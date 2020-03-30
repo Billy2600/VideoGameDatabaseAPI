@@ -346,6 +346,40 @@ namespace UnitTest
         }
 
         [TestMethod]
+        public async Task Add_AutoAddPublisher()
+        {
+            // Arrange
+            var testGame = new GameModel()
+            {
+                GameId = _fixture.Create<int>(),
+                GameName = _fixture.Create<string>(),
+                PublisherName = _fixture.Create<string>()
+            };
+
+            var publisherId = _fixture.Create<int>();
+
+            var publisherDbSet = CreateDbSetMock(new List<PublisherModel>() {  });
+
+            _gameContextMock.Setup(x => x.Games.Add(It.IsAny<GameModel>()));
+            _gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+            _publisherContextMock.Setup(x => x.Publishers.Add(It.IsAny<PublisherModel>())).Callback<PublisherModel>(x => x.PublisherId = publisherId);
+
+            // Act
+            var gameResult = await _gameRepo.Add(testGame);
+
+            // Assert
+            _gameContextMock.Verify(x => x.Games.Add(It.IsAny<GameModel>()), Times.Once);
+            _gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            Assert.AreEqual(testGame.GameId, gameResult.GameId);
+            Assert.AreEqual(testGame.GameName, gameResult.GameName);
+            Assert.AreEqual(testGame.PublisherName, gameResult.PublisherName);
+            Assert.AreEqual(publisherId, gameResult.PublisherId); // Should've been mapped to publisher that was added
+            _publisherContextMock.Verify(x => x.Publishers.Add(It.IsAny<PublisherModel>()), Times.Once);
+            _publisherContextMock.Verify(x => x.SaveChanges(), Times.Once);
+        }
+
+        [TestMethod]
         public async Task DeleteGame_BasicTest()
         {
             // Arrange
