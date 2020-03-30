@@ -311,6 +311,33 @@ namespace UnitTest
         }
 
         [TestMethod]
+        public async Task UpdateGame_AutoAddPublisher()
+        {
+            // Arrange
+            var testGame = new GameModel()
+            {
+                GameId = _fixture.Create<int>(),
+                GameName = _fixture.Create<string>(),
+                PublisherName = _fixture.Create<string>()
+            };
+
+            var publisherDbSet = CreateDbSetMock(new List<PublisherModel>() { });
+
+            _gameContextMock.Setup(x => x.SetModified(It.IsAny<GameModel>()));
+            _gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+
+            // Act
+            await _gameRepo.UpdateGame(testGame);
+
+            // Assert
+            _gameContextMock.Verify(x => x.SetModified(It.IsAny<GameModel>()), Times.Once);
+            _gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _publisherContextMock.Verify(x => x.Publishers.Add(It.IsAny<PublisherModel>()), Times.Once);
+            _publisherContextMock.Verify(x => x.SaveChanges(), Times.Once);
+        }
+
+        [TestMethod]
         public async Task Add_BasicTest()
         {
             // Arrange
