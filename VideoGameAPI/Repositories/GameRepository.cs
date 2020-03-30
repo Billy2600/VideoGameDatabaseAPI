@@ -67,9 +67,10 @@ namespace VideoGameAPI.Repositories
             return gameModel;
         }
 
-        public async Task UpdateGame(GameModel gameModel)
+        public async Task UpdateGame(GameModel updatedGame)
         {
-            _gameContext.SetModified(gameModel);
+            if (updatedGame.PublisherId == null && updatedGame.PublisherName != null) updatedGame.PublisherId = AddOrRetrievePublisher(updatedGame.PublisherName);
+            _gameContext.SetModified(updatedGame);
 
             await _gameContext.SaveChangesAsync();
         }
