@@ -76,7 +76,7 @@ namespace VideoGameAPI.Repositories
         public async Task UpdateGame(GameModel updatedGame)
         {
             if (updatedGame.PublisherId == null && updatedGame.PublisherName != null) updatedGame.PublisherId = AddOrRetrievePublisher(updatedGame.PublisherName);
-            if (updatedGame.Genres != null && updatedGame.Genres.Count > 0) AddNewGenres(updatedGame.GameId, updatedGame.Genres);
+            if (updatedGame.Genres != null && updatedGame.Genres.Count > 0) MapGenresToGameByNames(updatedGame.GameId, updatedGame.Genres);
             _gameContext.SetModified(updatedGame);
 
             await _gameContext.SaveChangesAsync();
@@ -90,7 +90,7 @@ namespace VideoGameAPI.Repositories
             _gameContext.Games.Add(newGame);
             await _gameContext.SaveChangesAsync();
             // Need to do this after adding it, so we have its ID
-            if (newGame.Genres != null && newGame.Genres.Count > 0) AddNewGenres(newGame.GameId, newGame.Genres);
+            if (newGame.Genres != null && newGame.Genres.Count > 0) MapGenresToGameByNames(newGame.GameId, newGame.Genres);
 
             return newGame;
         }
@@ -136,17 +136,23 @@ namespace VideoGameAPI.Repositories
                         select genre.GenreName).ToList();
         }
 
-        private void AddNewGenres(int gameId, List<string> genreNames)
+        private void MapGenresToGameByNames(int gameId, List<string> genreNames)
         {
             foreach (var genre in genreNames)
             {
-                if (_genreContext.Genres.Where(x => x.GenreName == genre).FirstOrDefault() == null)
+                var genreEntity = _genreContext.Genres.Where(x => x.GenreName == genre).FirstOrDefault();
+                if (genreEntity == null)
                 {
                     var newGenre = new GenreModel() { GenreName = genre };
                     _genreContext.Genres.Add(newGenre);
                     _genreContext.SaveChanges();
 
                     _gameGenreContext.GamesGenres.Add(new GameGenreModel() { GameId = gameId, GenreId = newGenre.GenreId });
+                    _gameGenreContext.SaveChanges();
+                }
+                else
+                {
+                    _gameGenreContext.GamesGenres.Add(new GameGenreModel() { GameId = gameId, GenreId = genreEntity.GenreId });
                     _gameGenreContext.SaveChanges();
                 }
             }

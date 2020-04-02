@@ -573,6 +573,7 @@ namespace UnitTest
 
             var publisherDbSet = CreateDbSetMock(new List<PublisherModel>() { });
             var genreDbSet = CreateDbSetMock(new List<GenreModel>() { testGenre });
+            var gameGenreDbSet = CreateDbSetMock(new List<GameGenreModel>() { });
 
             var filePath = _fixture.Create<string>();
 
@@ -590,6 +591,7 @@ namespace UnitTest
             _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
             _consoleContextMock.Setup(x => x.GetConsoleIdByName(It.IsAny<string>())).Returns(testConsole.ConsoleId);
             _genreContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
+            _gameGenreContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
 
             _fileManagerMock.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
             _fileManagerMock.Setup(x => x.StreamReader(It.IsAny<string>())).Returns(streamReader);
