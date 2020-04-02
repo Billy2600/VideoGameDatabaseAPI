@@ -221,6 +221,54 @@ namespace UnitTest
         }
 
         [TestMethod]
+        public void GetGamesByConsoleName_BasicTest()
+        {
+            // Arrange
+            var publisherId = _fixture.Create<int>();
+            var consoleId = _fixture.Create<int>();
+
+            _fixture.Customize<GameModel>(x => x
+                .With(y => y.ConsoleId, consoleId)
+                .Without(y => y.ConsoleName)
+            );
+            var testGames = _fixture.CreateMany<GameModel>();
+
+            var testConsole = new ConsoleModel()
+            {
+                ConsoleId = consoleId,
+                ConsoleName = _fixture.Create<string>()
+            };
+
+            var gameDbSet = CreateDbSetMock(testGames);
+            var publisherDbSet = CreateDbSetMock(new List<PublisherModel>() { }); // Empty as we're not testing this
+            var consoleDbSet = CreateDbSetMock(new List<ConsoleModel>() { testConsole });
+            var genreDbSet = CreateDbSetMock(new List<GenreModel> { });
+            var gameGenreDbSet = CreateDbSetMock(new List<GameGenreModel> { });
+
+            _gameContextMock.Setup(x => x.Games).Returns(gameDbSet.Object);
+            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+            _consoleContextMock.Setup(x => x.Consoles).Returns(consoleDbSet.Object);
+            _genreContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
+            _gameGenreContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
+
+            // Act
+            var gameResults = _gameRepo.GetGamesByConsoleName(testConsole.ConsoleName);
+
+            // Assert
+            Assert.AreEqual(testGames.Count(), gameResults.Count());
+            for (int i = 0; i < testGames.Count(); i++)
+            {
+                var testGame = testGames.ElementAt(i);
+                var gameResult = gameResults.ElementAt(i);
+
+                Assert.AreEqual(testGame.GameId, gameResult.GameId);
+                Assert.AreEqual(testGame.GameName, gameResult.GameName);
+                Assert.AreEqual(testGame.PublisherId, gameResult.PublisherId);
+                Assert.AreEqual(testConsole.ConsoleName, gameResult.ConsoleName);
+            }
+        }
+
+        [TestMethod]
         public void GetGames_WithGenres()
         {
             // Tests only one, because repeated calls to mock DbSets' GetEnumerator() only works on the first try
