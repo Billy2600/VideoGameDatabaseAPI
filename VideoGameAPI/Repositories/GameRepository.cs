@@ -54,6 +54,26 @@ namespace VideoGameAPI.Repositories
                     }).ToList();
         }
 
+        public IEnumerable<GameModel> GetGamesByConsoleName(string consoleName)
+        {
+            var games = _gameContext.Games.ToList();
+            var publishers = _publisherContext.Publishers.ToList();
+            var consoles = _consoleContext.Consoles.ToList();
+
+            return (from game in games
+                    join publisher in publishers on game.PublisherId equals publisher.PublisherId into pub
+                    from publisher in pub.DefaultIfEmpty()
+                    join console in consoles on game.ConsoleId equals console.ConsoleId into con
+                    from console in con.DefaultIfEmpty()
+                    where console.ConsoleName == consoleName
+                    select game + new GameModel
+                    {
+                        PublisherName = publisher == null ? null : publisher.PublisherName,
+                        ConsoleName = console == null ? null : console.ConsoleName,
+                        Genres = GetGenresForGame(game.GameId) // Might be more efficient but more complex ways to do this
+                    }).ToList();
+        }
+
         public async Task<ActionResult<GameModel>> GetGameById(int id)
         {
             var gameModel = await _gameContext.Games.FindAsync(id);

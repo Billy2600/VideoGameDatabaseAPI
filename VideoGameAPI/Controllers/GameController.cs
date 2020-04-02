@@ -32,6 +32,13 @@ namespace VideoGameAPI.Controllers
             return new ActionResult<IEnumerable<GameModel>>(_repository.GetGames());
         }
 
+        // GET: api/Game/Console/Genesis
+        [HttpGet("Console/{consoleName}")]
+        public async Task<ActionResult<IEnumerable<GameModel>>> GetGamesByConsoleName(string consoleName)
+        {
+            return new ActionResult<IEnumerable<GameModel>>(_repository.GetGamesByConsoleName(consoleName));
+        }
+
         // GET: api/Game/5
         [HttpGet("{id}")]
         public async Task<ActionResult<GameModel>> GetGame(int id)
