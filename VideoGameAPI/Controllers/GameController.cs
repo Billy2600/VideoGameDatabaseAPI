@@ -73,7 +73,7 @@ namespace VideoGameAPI.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new { message = $"Game ID {id} updated" });
         }
 
         // POST: api/Game
