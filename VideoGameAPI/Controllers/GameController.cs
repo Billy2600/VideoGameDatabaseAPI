@@ -9,6 +9,7 @@ using VideoGameAPI.Repositories;
 using VideoGameAPI.Models;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace VideoGameAPI.Controllers
 {
@@ -18,11 +19,13 @@ namespace VideoGameAPI.Controllers
     {
         private readonly IGameRepository _repository;
         private readonly IConfiguration _config;
+        private readonly ILogger<GameController> _logger;
 
-        public GameController(IGameRepository repository, IConfiguration config)
+        public GameController(IGameRepository repository, IConfiguration config, ILogger<GameController> logger)
         {
             _repository = repository;
             _config = config;
+            _logger = logger;
         }
 
         // GET: api/Game
@@ -43,6 +46,8 @@ namespace VideoGameAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<GameModel>> GetGame(int id)
         {
+            _logger.LogInformation($"Call to GameGame() with id {id}");
+
             var gameModel = await _repository.GetGameById(id);
 
             if (gameModel == null)
