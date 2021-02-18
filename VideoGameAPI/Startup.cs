@@ -29,11 +29,12 @@ namespace VideoGameAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ConsoleContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
-            services.AddDbContext<GenreContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
-            services.AddDbContext<PublisherContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
-            services.AddDbContext<GameContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
-            services.AddDbContext<GameGenreContext>(opt => opt.UseSqlServer("Server = localhost\\SQLEXPRESS; Database = VideoGames; Trusted_Connection = True;"));
+            const string connectionString = "";
+            services.AddDbContext<ConsoleContext>(opt => opt.UseNpgsql(connectionString));
+            services.AddDbContext<GenreContext>(opt => opt.UseNpgsql(connectionString));
+            services.AddDbContext<PublisherContext>(opt => opt.UseNpgsql(connectionString));
+            services.AddDbContext<GameContext>(opt => opt.UseNpgsql(connectionString));
+            services.AddDbContext<GameGenreContext>(opt => opt.UseNpgsql(connectionString));
 
             services.AddScoped<IGameRepository, GameRepository>();
             services.AddScoped<IFileManager, FileManager>();
