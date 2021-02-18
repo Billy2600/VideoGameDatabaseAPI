@@ -14,9 +14,9 @@ namespace VideoGameAPI.Controllers
     [ApiController]
     public class GenreController : ControllerBase
     {
-        private readonly GenreContext _context;
+        private readonly VideoGameContext _context;
 
-        public GenreController(GenreContext context)
+        public GenreController(VideoGameContext context)
         {
             _context = context;
         }

@@ -14,30 +14,22 @@ namespace VideoGameAPI.Repositories
 {
     public class GameRepository : IGameRepository
     {
-        private readonly GameContext _gameContext;
-        private readonly PublisherContext _publisherContext;
-        private readonly ConsoleContext _consoleContext;
-        private readonly GameGenreContext _gameGenreContext;
-        private readonly GenreContext _genreContext;
+        private readonly VideoGameContext _videoGameContext;
         private readonly IFileManager _fileManager;
 
-        public GameRepository(GameContext gameContext, PublisherContext publisherContext, ConsoleContext consoleContext, GameGenreContext gameGenreContext, GenreContext genreContext,
+        public GameRepository(VideoGameContext videoGameContext,
             IFileManager fileManager)
         {
-            _gameContext = gameContext;
-            _publisherContext = publisherContext;
-            _consoleContext = consoleContext;
-            _gameGenreContext = gameGenreContext;
-            _genreContext = genreContext;
+            _videoGameContext = videoGameContext;
             _fileManager = fileManager;
         }
 
         public IEnumerable<GameModel> GetGames()
         {
             // Convert these to lists so that we can do a join on them without error
-            var games = _gameContext.Games.ToList();
-            var publishers = _publisherContext.Publishers.ToList();
-            var consoles = _consoleContext.Consoles.ToList();
+            var games = _videoGameContext.Games.ToList();
+            var publishers = _videoGameContext.Publishers.ToList();
+            var consoles = _videoGameContext.Consoles.ToList();
 
             return (from game in games
                     // Doing the equivalent of a SQL left outer join
@@ -56,9 +48,9 @@ namespace VideoGameAPI.Repositories
 
         public IEnumerable<GameModel> GetGamesByConsoleName(string consoleName)
         {
-            var games = _gameContext.Games.ToList();
-            var publishers = _publisherContext.Publishers.ToList();
-            var consoles = _consoleContext.Consoles.ToList();
+            var games = _videoGameContext.Games.ToList();
+            var publishers = _videoGameContext.Publishers.ToList();
+            var consoles = _videoGameContext.Consoles.ToList();
 
             return (from game in games
                     join publisher in publishers on game.PublisherId equals publisher.PublisherId into pub
@@ -76,15 +68,15 @@ namespace VideoGameAPI.Repositories
 
         public async Task<ActionResult<GameModel>> GetGameById(int id)
         {
-            var gameModel = await _gameContext.Games.FindAsync(id);
+            var gameModel = await _videoGameContext.Games.FindAsync(id);
             if (gameModel.PublisherId != null)
             {
-                var publisher = _publisherContext.Publishers.Where(x => x.PublisherId == gameModel.PublisherId).FirstOrDefault();
+                var publisher = _videoGameContext.Publishers.Where(x => x.PublisherId == gameModel.PublisherId).FirstOrDefault();
                 if (publisher != null) gameModel.PublisherName = publisher.PublisherName;
             }
             if (gameModel.ConsoleId != null)
             {
-                var Console = _consoleContext.Consoles.Where(x => x.ConsoleId == gameModel.ConsoleId).FirstOrDefault();
+                var Console = _videoGameContext.Consoles.Where(x => x.ConsoleId == gameModel.ConsoleId).FirstOrDefault();
                 if (Console != null) gameModel.ConsoleName = Console.ConsoleName;
             }
 
@@ -97,9 +89,9 @@ namespace VideoGameAPI.Repositories
         {
             if (updatedGame.PublisherId == null && updatedGame.PublisherName != null) updatedGame.PublisherId = AddOrRetrievePublisher(updatedGame.PublisherName);
             if (updatedGame.Genres != null && updatedGame.Genres.Count > 0) MapGenresToGameByNames(updatedGame.GameId, updatedGame.Genres);
-            _gameContext.SetModified(updatedGame);
+            _videoGameContext.SetModified(updatedGame);
 
-            await _gameContext.SaveChangesAsync();
+            await _videoGameContext.SaveChangesAsync();
         }
 
         public async Task<GameModel> Add(GameModel newGame)
@@ -107,8 +99,8 @@ namespace VideoGameAPI.Repositories
             if(newGame.PublisherId == null && newGame.PublisherName != null) newGame.PublisherId = AddOrRetrievePublisher(newGame.PublisherName);
             // Similar functionality for Console purposefully omitted
 
-            _gameContext.Games.Add(newGame);
-            await _gameContext.SaveChangesAsync();
+            _videoGameContext.Games.Add(newGame);
+            await _videoGameContext.SaveChangesAsync();
             // Need to do this after adding it, so we have its ID
             if (newGame.Genres != null && newGame.Genres.Count > 0) MapGenresToGameByNames(newGame.GameId, newGame.Genres);
 
@@ -117,38 +109,38 @@ namespace VideoGameAPI.Repositories
 
         public async Task<GameModel> DeleteGame(int id)
         {
-            var gameModel = await _gameContext.Games.FindAsync(id);
+            var gameModel = await _videoGameContext.Games.FindAsync(id);
             if (gameModel == null)
             {
                 return null;
             }
 
-            _gameContext.Games.Remove(gameModel);
-            await _gameContext.SaveChangesAsync();
+            _videoGameContext.Games.Remove(gameModel);
+            await _videoGameContext.SaveChangesAsync();
 
             return gameModel;
         }
 
         private int AddOrRetrievePublisher(string publisherName)
         {
-            if (_publisherContext.Publishers.Where(x => x.PublisherName == publisherName).FirstOrDefault() == null)
+            if (_videoGameContext.Publishers.Where(x => x.PublisherName == publisherName).FirstOrDefault() == null)
             {
                 var newPublisher = new PublisherModel { PublisherName = publisherName };
-                _publisherContext.Publishers.Add(newPublisher);
-                _publisherContext.SaveChanges();
+                _videoGameContext.Publishers.Add(newPublisher);
+                _videoGameContext.SaveChanges();
 
                 return newPublisher.PublisherId;
             }
             else
             {
-                return _publisherContext.Publishers.Where(x => x.PublisherName == publisherName).FirstOrDefault().PublisherId;
+                return _videoGameContext.Publishers.Where(x => x.PublisherName == publisherName).FirstOrDefault().PublisherId;
             }
         }
 
         private List<string> GetGenresForGame(int gameId)
         {
-            var gameGenres = _gameGenreContext.GamesGenres.ToList();
-            var genres = _genreContext.Genres.ToList();
+            var gameGenres = _videoGameContext.GamesGenres.ToList();
+            var genres = _videoGameContext.Genres.ToList();
 
             return (from gameGenre in gameGenres
                         join genre in genres on gameGenre.GenreId equals genre.GenreId
@@ -160,27 +152,27 @@ namespace VideoGameAPI.Repositories
         {
             foreach (var genre in genreNames)
             {
-                var genreEntity = _genreContext.Genres.Where(x => x.GenreName == genre).FirstOrDefault();
+                var genreEntity = _videoGameContext.Genres.Where(x => x.GenreName == genre).FirstOrDefault();
                 if (genreEntity == null)
                 {
                     var newGenre = new GenreModel() { GenreName = genre };
-                    _genreContext.Genres.Add(newGenre);
-                    _genreContext.SaveChanges();
+                    _videoGameContext.Genres.Add(newGenre);
+                    _videoGameContext.SaveChanges();
 
-                    _gameGenreContext.GamesGenres.Add(new GameGenreModel() { GameId = gameId, GenreId = newGenre.GenreId });
-                    _gameGenreContext.SaveChanges();
+                    _videoGameContext.GamesGenres.Add(new GameGenreModel() { GameId = gameId, GenreId = newGenre.GenreId });
+                    _videoGameContext.SaveChanges();
                 }
                 else
                 {
-                    _gameGenreContext.GamesGenres.Add(new GameGenreModel() { GameId = gameId, GenreId = genreEntity.GenreId });
-                    _gameGenreContext.SaveChanges();
+                    _videoGameContext.GamesGenres.Add(new GameGenreModel() { GameId = gameId, GenreId = genreEntity.GenreId });
+                    _videoGameContext.SaveChanges();
                 }
             }
         }
 
         public bool GameExists(int id)
         {
-            return _gameContext.Games.Any(e => e.GameId == id);
+            return _videoGameContext.Games.Any(e => e.GameId == id);
         }
 
         public async Task ImportCSV(string filePath)
@@ -203,7 +195,7 @@ namespace VideoGameAPI.Repositories
                         ReleaseDate = DateTime.Parse(record.Year.ToString() + "-01-01"), // We only have a year, but you can't have a DateTime without month and day
                         PublisherName = record.Publisher.Split(',').First(), // Only using the first one, for now
                         Genres = record.Genre.Split(',').Select(x => x.Trim()).ToList(),
-                        ConsoleId = _consoleContext.GetConsoleIdByName(record.Console)
+                        ConsoleId = _videoGameContext.GetConsoleIdByName(record.Console)
                     };
 
                     await Add(newGame);

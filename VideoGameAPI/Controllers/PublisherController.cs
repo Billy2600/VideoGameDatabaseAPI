@@ -14,9 +14,9 @@ namespace VideoGameAPI.Controllers
     [ApiController]
     public class PublisherController : ControllerBase
     {
-        private readonly PublisherContext _context;
+        private readonly VideoGameContext _context;
 
-        public PublisherController(PublisherContext context)
+        public PublisherController(VideoGameContext context)
         {
             _context = context;
         }
@@ -105,7 +105,7 @@ namespace VideoGameAPI.Controllers
         [HttpGet("GateIdByName/{name}")]
         public async Task<ActionResult<int>> GetIdByName(string name)
         {
-            return await _context.GetIdByName(name);
+            return await _context.GetPublisherIdByName(name);
         }
 
         private bool PublisherModelExists(int id)

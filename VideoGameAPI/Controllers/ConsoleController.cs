@@ -14,9 +14,9 @@ namespace VideoGameAPI.Controllers
     [ApiController]
     public class ConsoleController : ControllerBase
     {
-        private readonly ConsoleContext _context;
+        private readonly VideoGameContext _context;
 
-        public ConsoleController(ConsoleContext context)
+        public ConsoleController(VideoGameContext context)
         {
             _context = context;
         }

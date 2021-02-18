@@ -30,11 +30,7 @@ namespace VideoGameAPI
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("VideoGames");
-            services.AddDbContext<ConsoleContext>(opt => opt.UseNpgsql(connectionString));
-            services.AddDbContext<GenreContext>(opt => opt.UseNpgsql(connectionString));
-            services.AddDbContext<PublisherContext>(opt => opt.UseNpgsql(connectionString));
-            services.AddDbContext<GameContext>(opt => opt.UseNpgsql(connectionString));
-            services.AddDbContext<GameGenreContext>(opt => opt.UseNpgsql(connectionString));
+            services.AddDbContext<VideoGameContext>(opt => opt.UseNpgsql(connectionString));
 
             services.AddScoped<IGameRepository, GameRepository>();
             services.AddScoped<IFileManager, FileManager>();

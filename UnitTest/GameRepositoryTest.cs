@@ -25,26 +25,17 @@ namespace UnitTest
         private Fixture _fixture;
         private GameRepository _gameRepo;
 
-        private Mock<GameContext> _gameContextMock;
-        private Mock<PublisherContext> _publisherContextMock;
-        private Mock<ConsoleContext> _consoleContextMock;
-        private Mock<GameGenreContext> _gameGenreContextMock;
-        private Mock<GenreContext> _genreContextMock;
+        private Mock<VideoGameContext> _videoGameContextMock;
         private Mock<IFileManager> _fileManagerMock;
 
         [TestInitialize]
         public void Initialize()
         {
             _fixture = new Fixture();
-            _gameContextMock = new Mock<GameContext>();
-            _publisherContextMock = new Mock<PublisherContext>();
-            _consoleContextMock = new Mock<ConsoleContext>();
-            _gameGenreContextMock = new Mock<GameGenreContext>();
-            _genreContextMock = new Mock<GenreContext>();
+            _videoGameContextMock = new Mock<VideoGameContext>();
             _fileManagerMock = new Mock<IFileManager>();
 
-            _gameRepo = new GameRepository(_gameContextMock.Object, _publisherContextMock.Object, _consoleContextMock.Object, _gameGenreContextMock.Object, _genreContextMock.Object,
-                _fileManagerMock.Object);
+            _gameRepo = new GameRepository(_videoGameContextMock.Object, _fileManagerMock.Object);
         }
 
         [TestMethod]
@@ -78,11 +69,11 @@ namespace UnitTest
             var genreDbSet = CreateDbSetMock(new List<GenreModel> { }); // Purposefully empty
             var gameGenreDbSet = CreateDbSetMock(new List<GameGenreModel> { }); // Same
 
-            _gameContextMock.Setup(x => x.Games.FindAsync(It.IsAny<int>())).ReturnsAsync(testGame);
-            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
-            _consoleContextMock.Setup(x => x.Consoles).Returns(consoleDbSet.Object);
-            _genreContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
-            _gameGenreContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Games.FindAsync(It.IsAny<int>())).ReturnsAsync(testGame);
+            _videoGameContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Consoles).Returns(consoleDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
 
             // Act
             var gameResult = await _gameRepo.GetGameById(testGame.GameId);
@@ -109,10 +100,10 @@ namespace UnitTest
             var genreDbSet = CreateDbSetMock(new List<GenreModel> { }); // Same
             var gameGenreDbSet = CreateDbSetMock(new List<GameGenreModel> { }); // Same
 
-            _gameContextMock.Setup(x => x.Games.FindAsync(It.IsAny<int>())).ReturnsAsync(testGame);
-            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
-            _genreContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
-            _gameGenreContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Games.FindAsync(It.IsAny<int>())).ReturnsAsync(testGame);
+            _videoGameContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
 
             // Act
             var gameResult = await _gameRepo.GetGameById(testGame.GameId);
@@ -151,10 +142,10 @@ namespace UnitTest
             var genreDbSet = CreateDbSetMock(new List<GenreModel> { testGenre }); // Same
             var gameGenreDbSet = CreateDbSetMock(new List<GameGenreModel> { testGameGenre }); // Same
 
-            _gameContextMock.Setup(x => x.Games.FindAsync(It.IsAny<int>())).ReturnsAsync(testGame);
-            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
-            _genreContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
-            _gameGenreContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Games.FindAsync(It.IsAny<int>())).ReturnsAsync(testGame);
+            _videoGameContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
 
             // Act
             var gameResult = await _gameRepo.GetGameById(testGame.GameId);
@@ -197,11 +188,11 @@ namespace UnitTest
             var genreDbSet = CreateDbSetMock(new List<GenreModel> { }); // Empty as we're not testing this
             var gameGenreDbSet = CreateDbSetMock(new List<GameGenreModel> { }); // Same
 
-            _gameContextMock.Setup(x => x.Games).Returns(gameDbSet.Object);
-            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
-            _consoleContextMock.Setup(x => x.Consoles).Returns(consoleDbSet.Object);
-            _genreContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
-            _gameGenreContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Games).Returns(gameDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Consoles).Returns(consoleDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
 
             // Act
             var gameResults = _gameRepo.GetGames();
@@ -245,11 +236,11 @@ namespace UnitTest
             var genreDbSet = CreateDbSetMock(new List<GenreModel> { });
             var gameGenreDbSet = CreateDbSetMock(new List<GameGenreModel> { });
 
-            _gameContextMock.Setup(x => x.Games).Returns(gameDbSet.Object);
-            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
-            _consoleContextMock.Setup(x => x.Consoles).Returns(consoleDbSet.Object);
-            _genreContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
-            _gameGenreContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Games).Returns(gameDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Consoles).Returns(consoleDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
 
             // Act
             var gameResults = _gameRepo.GetGamesByConsoleName(testConsole.ConsoleName);
@@ -324,11 +315,11 @@ namespace UnitTest
             var genreDbSet = CreateDbSetMock(testGenres);
             var gameGenreDbSet = CreateDbSetMock(testGameGenres);
 
-            _gameContextMock.Setup(x => x.Games).Returns(gameDbSet.Object);
-            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
-            _consoleContextMock.Setup(x => x.Consoles).Returns(consoleDbSet.Object);
-            _genreContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
-            _gameGenreContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Games).Returns(gameDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Consoles).Returns(consoleDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
 
             // Act
             var gameResults = _gameRepo.GetGames();
@@ -357,15 +348,15 @@ namespace UnitTest
                 PublisherId = _fixture.Create<int>()
             };
 
-            _gameContextMock.Setup(x => x.SetModified(It.IsAny<GameModel>()));
-            _gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+            _videoGameContextMock.Setup(x => x.SetModified(It.IsAny<GameModel>()));
+            _videoGameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
 
             // Act
             await _gameRepo.UpdateGame(testGame);
 
             // Assert
-            _gameContextMock.Verify(x => x.SetModified(It.IsAny<GameModel>()), Times.Once);
-            _gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SetModified(It.IsAny<GameModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [TestMethod]
@@ -381,18 +372,18 @@ namespace UnitTest
 
             var publisherDbSet = CreateDbSetMock(new List<PublisherModel>() { });
 
-            _gameContextMock.Setup(x => x.SetModified(It.IsAny<GameModel>()));
-            _gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
-            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+            _videoGameContextMock.Setup(x => x.SetModified(It.IsAny<GameModel>()));
+            _videoGameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+            _videoGameContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
 
             // Act
             await _gameRepo.UpdateGame(testGame);
 
             // Assert
-            _gameContextMock.Verify(x => x.SetModified(It.IsAny<GameModel>()), Times.Once);
-            _gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-            _publisherContextMock.Verify(x => x.Publishers.Add(It.IsAny<PublisherModel>()), Times.Once);
-            _publisherContextMock.Verify(x => x.SaveChanges(), Times.Once);
+            _videoGameContextMock.Verify(x => x.SetModified(It.IsAny<GameModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.Publishers.Add(It.IsAny<PublisherModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SaveChanges(), Times.Once);
         }
 
         [TestMethod]
@@ -415,23 +406,22 @@ namespace UnitTest
             var genreDbSet = CreateDbSetMock(new List<GenreModel>() { });
             var gameGenreDbSet = CreateDbSetMock(new List<GameGenreModel>() { });
 
-            _gameContextMock.Setup(x => x.Games.Add(It.IsAny<GameModel>()));
-            _gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
-            _genreContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
-            _genreContextMock.Setup(x => x.Genres.Add(It.IsAny<GenreModel>())).Callback<GenreModel>(x => x.GenreId = genreId);
-            _gameGenreContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
-            _gameGenreContextMock.Setup(x => x.GamesGenres.Add(It.IsAny<GameGenreModel>())).Callback<GameGenreModel>(x => addedGenreId = x.GenreId);
+            _videoGameContextMock.Setup(x => x.Games.Add(It.IsAny<GameModel>()));
+            _videoGameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+            _videoGameContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Genres.Add(It.IsAny<GenreModel>())).Callback<GenreModel>(x => x.GenreId = genreId);
+            _videoGameContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.GamesGenres.Add(It.IsAny<GameGenreModel>())).Callback<GameGenreModel>(x => addedGenreId = x.GenreId);
 
             // Act
             await _gameRepo.UpdateGame(testGame);
 
             // Assert
-            _gameContextMock.Verify(x => x.SetModified(It.IsAny<GameModel>()), Times.Once);
-            _gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-            _genreContextMock.Verify(x => x.SaveChanges(), Times.Once);
-            _genreContextMock.Verify(x => x.Genres.Add(It.IsAny<GenreModel>()), Times.Once);
-            _gameGenreContextMock.Verify(x => x.SaveChanges(), Times.Once);
-            _gameGenreContextMock.Verify(x => x.GamesGenres.Add(It.IsAny<GameGenreModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SetModified(It.IsAny<GameModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.Genres.Add(It.IsAny<GenreModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SaveChanges(), Times.Exactly(2));
+            _videoGameContextMock.Verify(x => x.GamesGenres.Add(It.IsAny<GameGenreModel>()), Times.Once);
 
             Assert.AreEqual(genreId, addedGenreId);
         }
@@ -455,16 +445,16 @@ namespace UnitTest
 
             var publisherDbSet = CreateDbSetMock(new List<PublisherModel>() { testPublisher });
 
-            _gameContextMock.Setup(x => x.Games.Add(It.IsAny<GameModel>()));
-            _gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
-            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Games.Add(It.IsAny<GameModel>()));
+            _videoGameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+            _videoGameContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
 
             // Act
             var gameResult = await _gameRepo.Add(testGame);
 
             // Assert
-            _gameContextMock.Verify(x => x.Games.Add(It.IsAny<GameModel>()), Times.Once);
-            _gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.Games.Add(It.IsAny<GameModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
             Assert.AreEqual(testGame.GameId, gameResult.GameId);
             Assert.AreEqual(testGame.GameName, gameResult.GameName);
             Assert.AreEqual(testPublisher.PublisherId, gameResult.PublisherId); // Should've automatically mapped Id based on name
@@ -486,23 +476,23 @@ namespace UnitTest
 
             var publisherDbSet = CreateDbSetMock(new List<PublisherModel>() {  });
 
-            _gameContextMock.Setup(x => x.Games.Add(It.IsAny<GameModel>()));
-            _gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
-            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
-            _publisherContextMock.Setup(x => x.Publishers.Add(It.IsAny<PublisherModel>())).Callback<PublisherModel>(x => x.PublisherId = publisherId);
+            _videoGameContextMock.Setup(x => x.Games.Add(It.IsAny<GameModel>()));
+            _videoGameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+            _videoGameContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Publishers.Add(It.IsAny<PublisherModel>())).Callback<PublisherModel>(x => x.PublisherId = publisherId);
 
             // Act
             var gameResult = await _gameRepo.Add(testGame);
 
             // Assert
-            _gameContextMock.Verify(x => x.Games.Add(It.IsAny<GameModel>()), Times.Once);
-            _gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.Games.Add(It.IsAny<GameModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
             Assert.AreEqual(testGame.GameId, gameResult.GameId);
             Assert.AreEqual(testGame.GameName, gameResult.GameName);
             Assert.AreEqual(testGame.PublisherName, gameResult.PublisherName);
             Assert.AreEqual(publisherId, gameResult.PublisherId); // Should've been mapped to publisher that was added
-            _publisherContextMock.Verify(x => x.Publishers.Add(It.IsAny<PublisherModel>()), Times.Once);
-            _publisherContextMock.Verify(x => x.SaveChanges(), Times.Once);
+            _videoGameContextMock.Verify(x => x.Publishers.Add(It.IsAny<PublisherModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SaveChanges(), Times.Once);
         }
 
         [TestMethod]
@@ -525,23 +515,22 @@ namespace UnitTest
             var genreDbSet = CreateDbSetMock(new List<GenreModel>() { });
             var gameGenreDbSet = CreateDbSetMock(new List<GameGenreModel>() { });
 
-            _gameContextMock.Setup(x => x.Games.Add(It.IsAny<GameModel>()));
-            _gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
-            _genreContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
-            _genreContextMock.Setup(x => x.Genres.Add(It.IsAny<GenreModel>())).Callback<GenreModel>(x => x.GenreId = genreId);
-            _gameGenreContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
-            _gameGenreContextMock.Setup(x => x.GamesGenres.Add(It.IsAny<GameGenreModel>())).Callback<GameGenreModel>(x => addedGenreId = x.GenreId);
+            _videoGameContextMock.Setup(x => x.Games.Add(It.IsAny<GameModel>()));
+            _videoGameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+            _videoGameContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Genres.Add(It.IsAny<GenreModel>())).Callback<GenreModel>(x => x.GenreId = genreId);
+            _videoGameContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.GamesGenres.Add(It.IsAny<GameGenreModel>())).Callback<GameGenreModel>(x => addedGenreId = x.GenreId);
 
             // Act
             var gameResult = await _gameRepo.Add(testGame);
 
             // Assert
-            _gameContextMock.Verify(x => x.Games.Add(It.IsAny<GameModel>()), Times.Once);
-            _gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-            _genreContextMock.Verify(x => x.SaveChanges(), Times.Once);
-            _genreContextMock.Verify(x => x.Genres.Add(It.IsAny<GenreModel>()), Times.Once);
-            _gameGenreContextMock.Verify(x => x.SaveChanges(), Times.Once);
-            _gameGenreContextMock.Verify(x => x.GamesGenres.Add(It.IsAny<GameGenreModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.Games.Add(It.IsAny<GameModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.Genres.Add(It.IsAny<GenreModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SaveChanges(), Times.Exactly(2));
+            _videoGameContextMock.Verify(x => x.GamesGenres.Add(It.IsAny<GameGenreModel>()), Times.Once);
 
             Assert.AreEqual(testGame.GameId, gameResult.GameId);
             Assert.AreEqual(testGame.GameName, gameResult.GameName);
@@ -558,17 +547,17 @@ namespace UnitTest
                 GameId = _fixture.Create<int>()
             };
 
-            _gameContextMock.Setup(x => x.Games.FindAsync(It.IsAny<int>())).ReturnsAsync(testGame);
-            _gameContextMock.Setup(x => x.Games.Remove(It.IsAny<GameModel>()));
-            _gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+            _videoGameContextMock.Setup(x => x.Games.FindAsync(It.IsAny<int>())).ReturnsAsync(testGame);
+            _videoGameContextMock.Setup(x => x.Games.Remove(It.IsAny<GameModel>()));
+            _videoGameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
 
             // Act
             var deleteResult = await _gameRepo.DeleteGame(testGame.GameId);
 
             // Assert
-            _gameContextMock.Verify(x => x.Games.FindAsync(It.IsAny<int>()), Times.Once);
-            _gameContextMock.Verify(x => x.Games.Remove(It.IsAny<GameModel>()), Times.Once);
-            _gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.Games.FindAsync(It.IsAny<int>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.Games.Remove(It.IsAny<GameModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
             Assert.AreEqual(testGame.GameId, deleteResult.GameId);
         }
 
@@ -578,17 +567,17 @@ namespace UnitTest
             // Arrange
             var invalidGameId = _fixture.Create<int>();
 
-            _gameContextMock.Setup(x => x.Games.FindAsync(It.IsAny<int>())).Returns(null);
-            _gameContextMock.Setup(x => x.Games.Remove(It.IsAny<GameModel>()));
-            _gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+            _videoGameContextMock.Setup(x => x.Games.FindAsync(It.IsAny<int>())).Returns(null);
+            _videoGameContextMock.Setup(x => x.Games.Remove(It.IsAny<GameModel>()));
+            _videoGameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
 
             // Act
             var deleteResult = await _gameRepo.DeleteGame(invalidGameId);
 
             // Assert
-            _gameContextMock.Verify(x => x.Games.FindAsync(It.IsAny<int>()), Times.Once);
-            _gameContextMock.Verify(x => x.Games.Remove(It.IsAny<GameModel>()), Times.Never);
-            _gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+            _videoGameContextMock.Verify(x => x.Games.FindAsync(It.IsAny<int>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.Games.Remove(It.IsAny<GameModel>()), Times.Never);
+            _videoGameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
             Assert.IsNull(deleteResult);
         }
 
@@ -633,13 +622,13 @@ namespace UnitTest
 
             var addedGame = new GameModel();
 
-            _gameContextMock.Setup(x => x.Games.Add(It.IsAny<GameModel>())).Callback<GameModel>(x => addedGame = x);
-            _gameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
+            _videoGameContextMock.Setup(x => x.Games.Add(It.IsAny<GameModel>())).Callback<GameModel>(x => addedGame = x);
+            _videoGameContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()));
 
-            _publisherContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
-            _consoleContextMock.Setup(x => x.GetConsoleIdByName(It.IsAny<string>())).Returns(testConsole.ConsoleId);
-            _genreContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
-            _gameGenreContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.Publishers).Returns(publisherDbSet.Object);
+            _videoGameContextMock.Setup(x => x.GetConsoleIdByName(It.IsAny<string>())).Returns(testConsole.ConsoleId);
+            _videoGameContextMock.Setup(x => x.Genres).Returns(genreDbSet.Object);
+            _videoGameContextMock.Setup(x => x.GamesGenres).Returns(gameGenreDbSet.Object);
 
             _fileManagerMock.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
             _fileManagerMock.Setup(x => x.StreamReader(It.IsAny<string>())).Returns(streamReader);
@@ -650,8 +639,8 @@ namespace UnitTest
 
             // Assert
             // All we really care about is that the game was added. Mapping and stuff is tested in the Add() tests
-            _gameContextMock.Verify(x => x.Games.Add(It.IsAny<GameModel>()), Times.Once);
-            _gameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.Games.Add(It.IsAny<GameModel>()), Times.Once);
+            _videoGameContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
 
             Assert.AreEqual(testGame.GameName, addedGame.GameName);
             Assert.AreEqual(testGame.ReleaseDate, addedGame.ReleaseDate);
