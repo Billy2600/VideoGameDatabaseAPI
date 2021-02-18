@@ -117,6 +117,11 @@ namespace VideoGameAPI.Controllers
         [HttpPost("ImportCSV")]
         public async Task<IActionResult> ImportCSV([FromForm] IFormFile file)
         {
+            if(file == null)
+            {
+                return StatusCode(400, "No file provided");
+            }
+
             var filePath = String.Empty;
 
             if(file.Length > 5000000)
