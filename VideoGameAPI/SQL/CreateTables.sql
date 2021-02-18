@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS "Genres" (
     "GenreName" VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "GameGenres" (
+CREATE TABLE IF NOT EXISTS "GamesGenres" (
     "GameGenreId" SERIAL PRIMARY KEY NOT NULL,
     "GameId" INT NOT NULL,
     "GenreId" INT NOT NULL
