@@ -29,7 +29,7 @@ namespace VideoGameAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            const string connectionString = "";
+            var connectionString = Configuration.GetConnectionString("VideoGames");
             services.AddDbContext<ConsoleContext>(opt => opt.UseNpgsql(connectionString));
             services.AddDbContext<GenreContext>(opt => opt.UseNpgsql(connectionString));
             services.AddDbContext<PublisherContext>(opt => opt.UseNpgsql(connectionString));
