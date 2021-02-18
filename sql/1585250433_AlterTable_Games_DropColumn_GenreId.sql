@@ -1,8 +1,0 @@
-IF COL_LENGTH('dbo.Games', 'GenreId') IS NOT NULL
-BEGIN
-	ALTER TABLE Games
-	DROP CONSTRAINT  FK_Genre;
-
-	ALTER TABLE Games
-	DROP COLUMN GenreId;
-END
